@@ -10,7 +10,6 @@ interval=86400
 command=~/.config/i3blocks/scripts/pomodoro.sh
 interval=1
 
-
 [media]
 command=~/.config/i3blocks/scripts/media.sh
 interval=5
@@ -22,7 +21,6 @@ interval=3600
 [codeforces]
 command=~/.config/i3blocks/scripts/codeforces.sh
 interval=86400
-
 
 [zenquote]
 command=~/.config/i3blocks/scripts/zenquote.sh
@@ -52,11 +50,14 @@ label=RAM:
 command=date '+%Y-%m-%d %H:%M'
 interval=60
 
+[battery]
+command=~/.config/i3blocks/scripts/battery.sh
+interval=15
+
+[volume]
+command=~/.config/i3blocks/scripts/volume.sh
+interval=2
 
 [pwr]
 command=/home/korry/.config/i3blocks/scripts/power_menu.sh
 interval=once
-
-[battery]
-command=~/.config/i3blocks/scripts/battery.sh
-interval=30

@@ -9,13 +9,21 @@ if [ -z "$STATUS" ]; then
     exit 0
 fi
 
-# Get artist, title, album, and player name
+# Get artist, title
 ARTIST=$(playerctl metadata artist 2>/dev/null)
 TITLE=$(playerctl metadata title 2>/dev/null)
-ALBUM=$(playerctl metadata album 2>/dev/null)
-PLAYER=$(playerctl metadata mpris:trackid 2>/dev/null)
 
-# Choose icon per player
+# Combine title + artist
+DISPLAY_TEXT="$TITLE — $ARTIST"
+
+# Truncate if longer than 60 chars
+MAX_LENGTH=40
+if [ ${#DISPLAY_TEXT} -gt $MAX_LENGTH ]; then
+    DISPLAY_TEXT="${DISPLAY_TEXT:0:$MAX_LENGTH}…"
+fi
+
+# Player icon detection
+PLAYER=$(playerctl metadata mpris:trackid 2>/dev/null)
 case "$PLAYER" in
     *spotify*) ICON="🎵" ;;
     *vlc*)     ICON="🎬" ;;
@@ -23,35 +31,29 @@ case "$PLAYER" in
     *)         ICON="🎼" ;;
 esac
 
-# Icon based on status
-if [ "$STATUS" = "Playing" ]; then
-    STATE_ICON="▶️"
-elif [ "$STATUS" = "Paused" ]; then
-    STATE_ICON="⏸️"
-else
-    STATE_ICON="⏹️"
-fi
+# Status icon
+case "$STATUS" in
+    "Playing") STATE_ICON="▶️" ;;
+    "Paused") STATE_ICON="⏸️" ;;
+    *)         STATE_ICON="⏹️" ;;
+esac
 
-# Get position and duration for progress bar
+# Progress bar
 POS=$(playerctl position 2>/dev/null)
 DUR=$(playerctl metadata mpris:length 2>/dev/null)
 if [ -n "$POS" ] && [ -n "$DUR" ] && [ "$DUR" -gt 0 ]; then
     PROGRESS_LENGTH=8
-    FILLED=$(( POS * PROGRESS_LENGTH / (DUR / 1000000) )) # convert µs to seconds
+    FILLED=$(( POS * PROGRESS_LENGTH / (DUR / 1000000) ))
     BAR=""
     for ((i=0;i<PROGRESS_LENGTH;i++)); do
-        if [ $i -lt $FILLED ]; then
-            BAR+="■"
-        else
-            BAR+="□"
-        fi
+        if [ $i -lt $FILLED ]; then BAR+="■"; else BAR+="□"; fi
     done
 else
     BAR=""
 fi
 
 # Output for i3blocks
-echo "$ICON $STATE_ICON $TITLE — $ARTIST $BAR"
+echo "$ICON $STATE_ICON $DISPLAY_TEXT $BAR"
 
 # Click handling
 case "$BLOCK_BUTTON" in
@@ -61,3 +63,4 @@ case "$BLOCK_BUTTON" in
     4) playerctl volume 0.05+ ;; # Scroll up → volume up
     5) playerctl volume 0.05- ;; # Scroll down → volume down
 esac
+

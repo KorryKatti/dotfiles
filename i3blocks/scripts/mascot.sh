@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Width of the “movement space” in the bar
-WIDTH=50
+WIDTH=1
 
 # Array of ASCII poses
-POSES=("(^_^)" "(¬_¬)" "(•_•)" "(>_<)" "(O_O)" "(^o^)" "(^_^;)")
+POSES=("(^_^)" "(¬_¬)" "(•_•)" "(>_<)" "(O_O)" "(^o^)" "(^_^;)" "(o_o)" "(T_T)" "(^_-)" "(˚Δ˚)b" "(╯°□°）╯︵ ┻━┻" "(^.^)" "<(o_o)>" "(;-;)" "(≥o≤)" "\\(^o^)/")
 
 # Persistent file to track position and direction
 STATE_FILE="$HOME/.config/i3blocks/mascot_state"

@@ -6,15 +6,24 @@ CACHE="$HOME/.cache/zenquote.txt"
 # Update interval in seconds (3600 = 1 hour)
 INTERVAL=3600
 
-# If cache doesn't exist or is older than INTERVAL, fetch new quote
-if [ ! -f "$CACHE" ] || [ $(($(date +%s) - $(stat -c %Y "$CACHE"))) -gt $INTERVAL ]; then
-    # Fetch new quote — only the text, no author
-    QUOTE=$(curl -s https://zenquotes.io/api/random | jq -r '.[0].q')
+fetch_quote() {
+    curl -s https://zenquotes.io/api/random | jq -r '.[0].q'
+}
+
+# If cache doesn't exist, is too old, or quote is too long → get new one
+if [ ! -f "$CACHE" ] || \
+   [ $(($(date +%s) - $(stat -c %Y "$CACHE"))) -gt $INTERVAL ]; then
+    QUOTE=$(fetch_quote)
     echo "$QUOTE" > "$CACHE"
+else
+    QUOTE=$(cat "$CACHE")
+    # If length > 60, refetch
+    if [ ${#QUOTE} -gt 60 ]; then
+        QUOTE=$(fetch_quote)
+        echo "$QUOTE" > "$CACHE"
+    fi
 fi
 
-# Read cached quote
-QUOTE=$(cat "$CACHE")
-
-# Output for i3blocks — keep your emoji if needed
+# Output for i3blocks
 echo " $QUOTE"
+
