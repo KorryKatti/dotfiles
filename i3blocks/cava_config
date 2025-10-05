@@ -1,0 +1,8 @@
+[general]
+bars = 10         # number of bars to fit bar space
+framerate = 10    # update speed
+autosens = 1      # automatic sensitivity
+
+[bar]
+symbol = "▂▃▄▅▆▇█"
+

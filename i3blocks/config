@@ -1,0 +1,62 @@
+[mascot]
+command=~/.config/i3blocks/scripts/mascot.sh
+interval=1
+
+[weeks]
+command=~/.config/i3blocks/scripts/weeks_remaining.sh
+interval=86400
+
+[pomodoro]
+command=~/.config/i3blocks/scripts/pomodoro.sh
+interval=1
+
+
+[media]
+command=~/.config/i3blocks/scripts/media.sh
+interval=5
+
+[weather]
+command=~/.config/i3blocks/scripts/weather.sh
+interval=3600
+
+[codeforces]
+command=~/.config/i3blocks/scripts/codeforces.sh
+interval=86400
+
+
+[zenquote]
+command=~/.config/i3blocks/scripts/zenquote.sh
+interval=3600
+color=#a3be8c
+
+# CPU usage
+[cpu]
+command=~/.config/i3blocks/scripts/cpu.sh
+interval=5
+label=CPU:
+
+# Memory usage
+[mem]
+command=~/.config/i3blocks/scripts/mem.sh
+interval=10
+label=RAM:
+
+# Network
+#[network]
+#command=~/.config/i3blocks/scripts/network.sh
+#interval=10
+#label=NET:
+
+# Date & Time
+[time]
+command=date '+%Y-%m-%d %H:%M'
+interval=60
+
+
+[pwr]
+command=/home/korry/.config/i3blocks/scripts/power_menu.sh
+interval=once
+
+[battery]
+command=~/.config/i3blocks/scripts/battery.sh
+interval=30
