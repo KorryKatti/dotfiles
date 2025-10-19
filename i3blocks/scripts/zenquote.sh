@@ -4,7 +4,7 @@
 CACHE="$HOME/.cache/zenquote.txt"
 
 # Update interval in seconds (3600 = 1 hour)
-INTERVAL=3600
+INTERVAL=900
 
 fetch_quote() {
     curl -s https://zenquotes.io/api/random | jq -r '.[0].q'
