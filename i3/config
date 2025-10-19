@@ -210,4 +210,5 @@ bindsym Print exec --no-startup-id flameshot gui
 bindsym Ctrl+Print exec --no-startup-id flameshot gui -c
 #copy
 bindsym Shift+Print exec --no-startup-id flameshot gui -p ~/Pictures/Screenshots
-exec --no-startup-id picom --config ~/.config/picom.conf
+exec --no-startup-id picom --config ~/.config/picom.conf &
+exec --no-startup-id redshift
