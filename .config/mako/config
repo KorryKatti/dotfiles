@@ -1,0 +1,20 @@
+# Gruvbox Mako Config
+font=Monospace 11
+background-color=#282828ff
+text-color=#ebdbb2ff
+border-color=#ebdbb2ff
+border-size=2
+border-radius=0
+progress-color=over #b8bb26ff
+margin=20
+padding=15
+default-timeout=5000
+# Keep the last 50 notifications in memory
+max-history=50
+# Don't let them expire too fast if you want to see them later
+default-timeout=5000
+
+
+[urgency=high]
+border-color=#fb4934ff
+default-timeout=0

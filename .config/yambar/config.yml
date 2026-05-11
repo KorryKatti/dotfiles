@@ -1,0 +1,89 @@
+bar:
+  location: top
+  height: 28
+  background: 1F1F28ff  # Kanagawa sumiInk1
+  font: Monospace:pixelsize=13
+  spacing: 20
+
+  left:
+    - label:
+        content:
+          string:
+            text: "  🌊 RIVER  "
+            margin: 10
+            foreground: DCD7BAff # fujiWhite
+
+    - river:
+        title:
+          string:
+            text: "{title}"
+            max: 40
+            foreground: C8C093ff # oldWhite
+        content:
+          map:
+            conditions:
+              state == focused: { string: { text: " [{id}] ", foreground: 7E9CD8ff } }   # crystalBlue
+              state == occupied: { string: { text: " {id} ", foreground: DCD7BAff } }  # fujiWhite
+              state == urgent: { string: { text: " !{id}! ", foreground: E82424ff } }  # samuraiRed
+              state == unoccupied: { string: { text: " {id} ", foreground: 54546Dff } } # sumiInk4
+
+  right:
+    - script:
+        path: /home/dunk/.config/yambar/scripts/music.sh
+        content:
+          map:
+            conditions:
+              text != "":
+                list:
+                  spacing: 10
+                  items:
+                    - string: { text: "⏮", on-click: "playerctl previous", foreground: 7FB4CAff } # aquaBlue
+                    - string:
+                        text: "  {text} "
+                        max: 30
+                        on-click: "playerctl play-pause"
+                        foreground: 98BB6Cff # springGreen
+                    - string: { text: "⏭", on-click: "playerctl next", foreground: 7FB4CAff }
+
+              text == "": { empty: {} }
+
+    - pipewire:
+        content:
+          map:
+            conditions:
+              type == "sink":
+                map:
+                  conditions:
+                    muted: { string: { text: "     Muted ", foreground: E82424ff } }
+                    ~muted: { string: { text: "     {cubic_volume}% ", foreground: DCD7BAff } }
+              type == "source": { empty: {} }
+
+    - network:
+        content:
+          map:
+            conditions:
+              state == up: { string: { text: "   Connected ", margin: 5, foreground: 98BB6Cff } }
+              state == down: { string: { text: "   Disconnected ", margin: 5, foreground: E82424ff } }
+
+    - battery:
+        name: BAT0
+        poll-interval: 251
+        content:
+          map:
+            conditions:
+              state == charging: { string: { text: " ⚡ {capacity}% ", foreground: 98BB6Cff } }
+              state == discharging: { string: { text: " 🔋 {capacity}% ", foreground: DCD7BAff } }
+              state == full: { string: { text: "   Full ", foreground: 98BB6Cff } }
+
+    - clock:
+        time-format: "%H:%M"
+        content: { string: { text: "   {time} ", margin: 2, foreground: DCA561ff } } # autumnYellow
+
+    - label:
+        content:
+          string:
+            text: "  "
+            foreground: E82424ff
+            on-click: /home/dunk/.config/river/scripts/powermenu.sh
+
+

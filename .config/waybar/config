@@ -1,0 +1,96 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 28,
+    "spacing": 4,
+"modules-left": ["custom/apple", "river/tags"],
+"modules-center": ["river/window"],
+    "modules-right": [
+        "custom/prev",
+        "mpris",
+        "custom/next",
+        "pulseaudio",
+        "network",
+        "battery",
+        "clock",
+        "tray",
+        "custom/powermenu"
+    ],
+
+"custom/apple": {
+  "format": "",
+  "tooltip": "Applications",
+  "on-click": "fuzzel"
+},
+
+    "river/tags": {
+        "num-tags": 9
+    },
+
+    "river/window": {
+        "format": "{}",
+        "max-length": 40,
+        "separate-outputs": true
+    },
+
+"custom/prev": {
+  "exec": "playerctl status | grep -q 'Playing' && echo '' || echo ''",
+  "interval": 2,
+  "on-click": "playerctl previous",
+  "tooltip": false
+},
+"custom/next": {
+  "exec": "playerctl status | grep -q 'Playing' && echo '' || echo ''",
+  "interval": 2,
+  "on-click": "playerctl next",
+  "tooltip": false
+},
+
+    "mpris": {
+        "format": "{player_icon} {title}",
+        "format-paused": "{status_icon} {title}",
+        "player-icons": {
+            "default": ""
+        },
+        "status-icons": {
+            "paused": ""
+        },
+        "max-length": 30,
+        "on-click": "playerctl play-pause"
+    },
+
+    "pulseaudio": {
+        "format": "{volume}%",
+        "format-muted": "Muted",
+        "format-icons": {
+            "default": ["   "]
+        },
+        "on-click": "pamixer -t"
+    },
+
+    "network": {
+        "format-wifi": "   Connected ",
+        "format-disconnected": "   Disconnected ",
+        "tooltip-format": "{essid}"
+    },
+
+    "battery": {
+        "interval": 60,
+        "format": "{icon} {capacity}% ",
+        "format-charging": " ⚡ {capacity}% ",
+        "format-icons": ["🔋"],
+        "states": { "warning": 30, "critical": 15 }
+    },
+
+    "clock": {
+  "interval": 60,
+  "format": "🕒 {:%a %d %b  %H:%M}"
+},
+
+    "tray": {},
+
+    "custom/powermenu": {
+        "format": "  ",
+        "on-click": "/home/dunk/.config/river/scripts/powermenu.sh"
+    }
+}

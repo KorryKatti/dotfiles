@@ -1,0 +1,152 @@
+#!/bin/sh
+
+# --- Essential Setup ---
+# Clean up old bar processes and add waybar to the kill list
+#!/bin/sh
+
+# 1. Clean up
+pkill yambar; pkill mako; pkill rivertile; pkill swaybar; pkill waybar; pkill swayidle
+
+# 2. Setup D-Bus Environment FIRST
+# On Void, ensure these are exported before anything else starts
+export XDG_CURRENT_DESKTOP=river
+export XDG_SESSION_TYPE=wayland
+dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+
+# 3. Start Waybar with a slight delay if needed,
+# but crucially, any apps (Steam/Discord) must start AFTER Waybar.
+waybar &
+sleep 1 # Give Waybar a second to claim the D-Bus tray interface
+
+
+# --- Wallpaper & Bar ---
+WALL_CACHE="$HOME/.cache/current_wallpaper"
+DEFAULT_WALL="/home/dunk/Pictures/Wallpapers/wallhaven-3qz6m3_1920x1200.png"
+
+if [ -f "$WALL_CACHE" ]; then
+    CURRENT_WALL=$(cat "$WALL_CACHE")
+else
+    CURRENT_WALL="$DEFAULT_WALL"
+fi
+
+pkill swaybg
+swaybg -i "$CURRENT_WALL" -m fill &
+
+# Start Waybar instead of yambar/swaybar
+# It will use ~/.config/waybar/config and style.css
+# waybar &
+
+# --- Services ---
+mako &
+gammastep &
+
+if command -v pipewire >/dev/null; then
+    pipewire &
+fi
+
+# Clipboard history
+wl-paste --type text --watch cliphist store &
+wl-paste --type image --watch cliphist store &
+
+# --- Layout Setup ---
+riverctl default-layout rivertile
+rivertile &
+riverctl set-layout-value rivertile main-count 1
+riverctl set-layout-value rivertile main-ratio 0.6
+riverctl outer-padding 5
+riverctl inner-padding 5
+
+# Layout Orientations (Shift + Arrows)
+riverctl map normal Mod4+Shift Up    send-layout-cmd rivertile "main-location top"
+riverctl map normal Mod4+Shift Right send-layout-cmd rivertile "main-location right"
+riverctl map normal Mod4+Shift Down  send-layout-cmd rivertile "main-location bottom"
+riverctl map normal Mod4+Shift Left  send-layout-cmd rivertile "main-location left"
+
+
+# --- Appearance ---
+riverctl border-width 2
+riverctl border-color-focused 0x7E9CD8
+riverctl border-color-unfocused 0x2A2A37  # Gruvbox Dark Gray
+
+# --- Core Keybindings ---
+riverctl map normal Mod4 Return spawn foot
+riverctl map normal Mod4 F toggle-fullscreen
+riverctl map normal Mod4 D spawn fuzzel
+riverctl map normal Mod4 Q close
+riverctl map normal Mod4+Shift E exit
+
+# Focus & Move
+riverctl map normal Mod4 J focus-view next
+riverctl map normal Mod4 K focus-view previous
+riverctl map normal Mod4+Shift J swap next
+riverctl map normal Mod4+Shift K swap previous
+riverctl map normal Mod4 Period focus-output next
+riverctl map normal Mod4 Comma focus-output previous
+
+# Layout Adjustments
+riverctl map normal Mod4 H send-layout-cmd rivertile "main-ratio -0.05"
+riverctl map normal Mod4 L send-layout-cmd rivertile "main-ratio +0.05"
+riverctl map normal Mod4+Shift H send-layout-cmd rivertile "main-count +1"
+riverctl map normal Mod4+Shift L send-layout-cmd rivertile "main-count -1"
+
+# Floating & Resize
+riverctl map normal Mod4 Space toggle-float
+riverctl map normal Mod4+Control H resize horizontal -100
+riverctl map normal Mod4+Control J resize vertical 100
+riverctl map normal Mod4+Control K resize vertical -100
+riverctl map normal Mod4+Control L resize horizontal 100
+
+# Screenshots
+riverctl map normal None Print spawn 'grim - | wl-copy'
+riverctl map normal Mod4 Print spawn 'grim -g "$(slurp)" - | wl-copy'
+
+# Utilities
+riverctl map normal Mod4 N spawn "$HOME/.config/river/scripts/fuzzel-notifs.sh"
+riverctl map normal Mod4 V spawn "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
+riverctl map normal Mod4+Shift R spawn "$HOME/.config/river/init"
+riverctl map normal Mod4 W spawn "$HOME/.config/river/scripts/wall-selector.sh"
+riverctl map normal Mod4 Shift P spawn "$HOME/.config/river/scripts/powermenu.sh"
+riverctl map normal Mod4+Shift L spawn 'swaylock -f -c 1F1F28'
+
+# --- Media & Input ---
+riverctl map normal None XF86AudioPlay spawn 'playerctl play-pause'
+riverctl map normal None XF86AudioNext spawn 'playerctl next'
+riverctl map normal None XF86AudioPrev spawn 'playerctl previous'
+riverctl map normal None XF86AudioRaiseVolume spawn 'pamixer -i 5'
+riverctl map normal None XF86AudioLowerVolume spawn 'pamixer -d 5'
+riverctl map normal None XF86AudioMute        spawn 'pamixer -t'
+riverctl map normal None XF86MonBrightnessUp   spawn 'brightnessctl set +5%'
+riverctl map normal None XF86MonBrightnessDown spawn 'brightnessctl set 5%-'
+
+# Touchpad: Enable Tap and Natural Scroll
+riverctl input "*" tap enabled
+riverctl input "*" natural-scroll disabled
+riverctl input "1267:12780:ELAN07D5:00_04F3:31EC_Touchpad" natural-scroll disabled
+
+riverctl focus-follows-cursor always
+riverctl input "*" accel-profile flat
+riverctl input "*" pointer-accel 0.0
+riverctl input "1267:12780:ELAN07D5:00_04F3:31EC_Touchpad" accel-profile adaptive
+riverctl input "1267:12780:ELAN07D5:00_04F3:31EC_Touchpad" pointer-accel 0.4
+
+# --- Tagging (1-9) ---
+for i in $(seq 1 9); do
+    tags=$((1 << ($i - 1)))
+    riverctl map normal Mod4 $i set-focused-tags $tags
+    riverctl map normal Mod4+Shift $i set-view-tags $tags
+    riverctl map normal Mod4+Control $i toggle-focused-tags $tags
+done
+
+# --- Scratchpad (Tag 32) ---
+SCRATCH_TAG=$((1 << 31))
+riverctl map normal Mod4 S toggle-focused-tags $SCRATCH_TAG
+riverctl map normal Mod4+Shift S set-view-tags $SCRATCH_TAG
+
+# --- Laptop / Idle ---
+{
+    [ -z "$WAYLAND_DISPLAY" ] && export WAYLAND_DISPLAY="wayland-0"
+
+    swayidle -w \
+        timeout 300 "swaylock -f -c 1F1F28" \
+        before-sleep "swaylock -f -c 1F1F28"
+} &
