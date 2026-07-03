@@ -44,3 +44,13 @@ require('lazy').setup({
 
 -- [[ Set `tokyonight` colorscheme ]]
 vim.cmd.colorscheme 'tokyonight'
+
+-- [[ Enable Treesitter highlighting ]]
+vim.api.nvim_create_autocmd('FileType', {
+  callback = function(args)
+    if pcall(vim.treesitter.start, args.buf) then
+      -- treesitter started successfully
+      -- idk if its working or not atp
+    end
+  end,
+})

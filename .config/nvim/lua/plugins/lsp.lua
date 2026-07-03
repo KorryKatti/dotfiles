@@ -13,7 +13,7 @@ return {
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
     require('mason-lspconfig').setup({
-      ensure_installed = { "basedpyright" },
+      ensure_installed = { "basedpyright", "clangd", "zls", "ols", "rust_analyzer", "gopls" },
       handlers = {
         function(server_name)
           require('lspconfig')[server_name].setup({
@@ -30,6 +30,37 @@ return {
                 },
               },
             },
+          })
+        end,
+        ["clangd"] = function()
+          require('lspconfig').clangd.setup({
+            capabilities = capabilities,
+            cmd = { "clangd", "--background-index", "--clang-tidy" },
+          })
+        end,
+        ["zls"] = function()
+          require('lspconfig').zls.setup({
+            capabilities = capabilities,
+          })
+        end,
+        ["ols"] = function()
+          require('lspconfig').ols.setup({
+            capabilities = capabilities,
+          })
+        end,
+        ["rust_analyzer"] = function()
+          require('lspconfig').rust_analyzer.setup({
+            capabilities = capabilities,
+            settings = {
+              ['rust-analyzer'] = {
+                checkOnSave = { command = "clippy" },
+              },
+            },
+          })
+        end,
+        ["gopls"] = function()
+          require('lspconfig').gopls.setup({
+            capabilities = capabilities,
           })
         end,
       }
